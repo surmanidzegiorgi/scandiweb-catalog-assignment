@@ -1,1 +1,0 @@
-/home/giorgisurma/Devs/my-app/lib/web/js-cookie/cookie-wrapper.js
