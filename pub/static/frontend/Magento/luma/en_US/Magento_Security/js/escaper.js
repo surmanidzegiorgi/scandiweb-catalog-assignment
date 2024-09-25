@@ -1,0 +1,1 @@
+/home/giorgisurma/Devs/my-app/vendor/magento/module-security/view/base/web/js/escaper.js

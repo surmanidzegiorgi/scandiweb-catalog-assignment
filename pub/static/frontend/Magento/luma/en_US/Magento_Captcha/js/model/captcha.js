@@ -1,0 +1,1 @@
+/home/giorgisurma/Devs/my-app/vendor/magento/module-captcha/view/frontend/web/js/model/captcha.js

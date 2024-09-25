@@ -1,0 +1,1 @@
+/home/giorgisurma/Devs/my-app/vendor/magento/module-catalog/view/frontend/web/js/storage-manager.js
