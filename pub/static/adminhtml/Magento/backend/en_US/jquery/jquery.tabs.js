@@ -1,0 +1,1 @@
+/home/giorgisurma/Devs/my-app/lib/web/jquery/jquery.tabs.js

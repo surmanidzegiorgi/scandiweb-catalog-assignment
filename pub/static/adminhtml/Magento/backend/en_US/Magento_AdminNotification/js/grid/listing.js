@@ -1,0 +1,1 @@
+/home/giorgisurma/Devs/my-app/vendor/magento/module-admin-notification/view/adminhtml/web/js/grid/listing.js
