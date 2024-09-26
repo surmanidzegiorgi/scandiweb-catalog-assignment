@@ -1,9 +1,5 @@
 <?php
 
-// code with additional comments to help with future review 🧐
-// code with additional comments to help with future review 🧐
-// code with additional comments to help with future review 🧐
-
 namespace Scandiweb\Test\Setup\Patch\Data;
 
 use Magento\Catalog\Api\CategoryLinkManagementInterface;
@@ -23,29 +19,63 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class AddSimpleProduct implements DataPatchInterface
 {
-    // Declaring dependencies for creating and saving a product
-    private $productFactory;
-    private $productRepo;
-    private $appState;
-    private $storeManager;
-    private $sourceItemFactory;
-    private $sourceItemsSave;
-    private $eavSetup;
-    private $categoryLink;
-    private $sourceItems = [];
 
     /**
-     * Constructor to initialize required services
-     *
-     * @param ProductInterfaceFactory $productFactory - Factory for creating product instances
-     * @param ProductRepositoryInterface $productRepo - Repository for saving product instances
-     * @param State $appState - Application state for emulating areas
-     * @param StoreManagerInterface $storeManager - Store manager to get store-specific data
-     * @param EavSetup $eavSetup - EAV setup for getting attribute set ID
-     * @param SourceItemInterfaceFactory $sourceItemFactory - Factory for creating source items (inventory)
-     * @param SourceItemsSaveInterface $sourceItemsSave - Interface for saving source items (inventory)
-     * @param CategoryLinkManagementInterface $categoryLink - Interface for managing category links for products
+     * @var ProductInterfaceFactory Factory for creating product instances.
      */
+    protected ProductInterfaceFactory $productFactory;
+
+    /**
+     * @var ProductRepositoryInterface Repository for saving product instances.
+     */
+    protected ProductRepositoryInterface $productRepo;
+
+    /**
+     * @var State Application state for emulating areas.
+     */
+    protected State $appState;
+
+    /**
+     * @var StoreManagerInterface Store manager to get store-specific data.
+     */
+    protected StoreManagerInterface $storeManager;
+
+    /**
+     * @var EavSetup EAV setup for getting attribute set ID.
+     */
+    protected EavSetup $eavSetup;
+
+    /**
+     * @var SourceItemInterfaceFactory Factory for creating source items (inventory).
+     */
+    protected SourceItemInterfaceFactory $sourceItemFactory;
+
+    /**
+     * @var SourceItemsSaveInterface Interface for saving source items (inventory).
+     */
+    protected SourceItemsSaveInterface $sourceItemsSave;
+
+    /**
+     * @var CategoryLinkManagementInterface Interface for managing category links for products.
+     */
+    protected CategoryLinkManagementInterface $categoryLink;
+
+    /**
+     * @var array Array to hold source items data.
+     */
+    protected array $sourceItems = [];
+
+   /**
+    * AddSimpleProduct constructor.
+    * @param ProductInterfaceFactory $productFactory
+    * @param ProductRepositoryInterface $productRepo
+    * @param State $appState
+    * @param StoreManagerInterface $storeManager
+    * @param EavSetup $eavSetup
+    * @param SourceItemInterfaceFactory $sourceItemFactory
+    * @param SourceItemsSaveInterface $sourceItemsSave
+    * @param CategoryLinkManagementInterface $categoryLink
+    */
     public function __construct(
         ProductInterfaceFactory $productFactory,
         ProductRepositoryInterface $productRepo,
@@ -66,66 +96,72 @@ class AddSimpleProduct implements DataPatchInterface
         $this->categoryLink = $categoryLink;
     }
 
-    /**
-     * Apply function executed by Magento's setup:upgrade command
-     * Emulates adminhtml area to execute product creation process
+   /**
+     * Emulates adminhtml area to execute product creation process.
+     *
+     * @return void
      */
     public function apply(): void
     {
         $this->appState->emulateAreaCode('adminhtml', [$this, 'execute']);
     }
 
+    /**
+     * Executes the product creation process with inventory and category assignment.
+     *
+     * @return void
+     */
     public function execute(): void
     {
-        // Create product instance
         $product = $this->productFactory->create();
 
-        // Check if product with this SKU already exists to avoid duplicates
         if ($product->getIdBySku('demo-product')) {
             return; 
         }
 
-        // Get the attribute set ID for the default attribute set
         $attributeSetId = $this->eavSetup->getAttributeSetId(Product::ENTITY, 'Default');
-
-        // Get the website ID for the current store
         $websiteIds = [$this->storeManager->getStore()->getWebsiteId()];
 
-        // Set product details and properties
-        $product->setTypeId(Type::TYPE_SIMPLE) 
-            ->setWebsiteIds($websiteIds) 
-            ->setAttributeSetId($attributeSetId) 
-            ->setName('Demo Product') 
-            ->setUrlKey('demo-product') 
-            ->setSku('demo-product') 
+        $product->setTypeId(Type::TYPE_SIMPLE)
+            ->setWebsiteIds($websiteIds)
+            ->setAttributeSetId($attributeSetId)
+            ->setName('Demo Product')
+            ->setUrlKey('demo-product')
+            ->setSku('demo-product')
             ->setPrice(19.99)
             ->setVisibility(Visibility::VISIBILITY_BOTH)
             ->setStatus(Status::STATUS_ENABLED)
-            ->setStockData(['use_config_manage_stock' => 1, 'is_qty_decimal' => 0, 'is_in_stock' => 1]); 
+            ->setStockData(['use_config_manage_stock' => 1, 'is_qty_decimal' => 0, 'is_in_stock' => 1]);
 
-        // Save the product to the repository
         $this->productRepo->save($product);
 
-        // Create inventory source item for the product
         $sourceItem = $this->sourceItemFactory->create();
-        $sourceItem->setSourceCode('default') 
-            ->setQuantity(50) 
-            ->setSku($product->getSku()) // Associate inventory with product SKU
-            ->setStatus(SourceItemInterface::STATUS_IN_STOCK); // Mark as in stock
+        $sourceItem->setSourceCode('default')
+            ->setQuantity(50)
+            ->setSku($product->getSku())
+            ->setStatus(SourceItemInterface::STATUS_IN_STOCK);
+
         $this->sourceItems[] = $sourceItem;
 
-        // Save the source items to the inventory
         $this->sourceItemsSave->execute($this->sourceItems);
-
-        // Assign the product to a category by category ID (e.g., 2)
         $this->categoryLink->assignProductToCategories($product->getSku(), [2]);
     }
 
+    /**
+     * Returns an array of dependencies for this class.
+     *
+     * @return array
+     */
     public static function getDependencies(): array
     {
         return [];
     }
 
+    /**
+     * Returns an array of aliases for this class.
+     *
+     * @return array
+     */
     public function getAliases(): array
     {
         return [];
