@@ -19,63 +19,45 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class AddSimpleProduct implements DataPatchInterface
 {
-
-    /**
-     * @var ProductInterfaceFactory Factory for creating product instances.
-     */
+    /** @var ProductInterfaceFactory */
     protected ProductInterfaceFactory $productFactory;
 
-    /**
-     * @var ProductRepositoryInterface Repository for saving product instances.
-     */
+    /** @var ProductRepositoryInterface */
     protected ProductRepositoryInterface $productRepo;
 
-    /**
-     * @var State Application state for emulating areas.
-     */
+    /** @var State */
     protected State $appState;
 
-    /**
-     * @var StoreManagerInterface Store manager to get store-specific data.
-     */
+    /** @var StoreManagerInterface */
     protected StoreManagerInterface $storeManager;
 
-    /**
-     * @var EavSetup EAV setup for getting attribute set ID.
-     */
+    /** @var EavSetup */
     protected EavSetup $eavSetup;
 
-    /**
-     * @var SourceItemInterfaceFactory Factory for creating source items (inventory).
-     */
+    /** @var SourceItemInterfaceFactory */
     protected SourceItemInterfaceFactory $sourceItemFactory;
 
-    /**
-     * @var SourceItemsSaveInterface Interface for saving source items (inventory).
-     */
+    /** @var SourceItemsSaveInterface */
     protected SourceItemsSaveInterface $sourceItemsSave;
 
-    /**
-     * @var CategoryLinkManagementInterface Interface for managing category links for products.
-     */
+    /** @var CategoryLinkManagementInterface */
     protected CategoryLinkManagementInterface $categoryLink;
 
-    /**
-     * @var array Array to hold source items data.
-     */
+    /** @var array */
     protected array $sourceItems = [];
 
-   /**
-    * AddSimpleProduct constructor.
-    * @param ProductInterfaceFactory $productFactory
-    * @param ProductRepositoryInterface $productRepo
-    * @param State $appState
-    * @param StoreManagerInterface $storeManager
-    * @param EavSetup $eavSetup
-    * @param SourceItemInterfaceFactory $sourceItemFactory
-    * @param SourceItemsSaveInterface $sourceItemsSave
-    * @param CategoryLinkManagementInterface $categoryLink
-    */
+    /**
+     * AddSimpleProduct constructor.
+     *
+     * @param ProductInterfaceFactory $productFactory
+     * @param ProductRepositoryInterface $productRepo
+     * @param State $appState
+     * @param StoreManagerInterface $storeManager
+     * @param EavSetup $eavSetup
+     * @param SourceItemInterfaceFactory $sourceItemFactory
+     * @param SourceItemsSaveInterface $sourceItemsSave
+     * @param CategoryLinkManagementInterface $categoryLink
+     */
     public function __construct(
         ProductInterfaceFactory $productFactory,
         ProductRepositoryInterface $productRepo,
@@ -96,7 +78,7 @@ class AddSimpleProduct implements DataPatchInterface
         $this->categoryLink = $categoryLink;
     }
 
-   /**
+    /**
      * Emulates adminhtml area to execute product creation process.
      *
      * @return void
@@ -106,9 +88,10 @@ class AddSimpleProduct implements DataPatchInterface
         $this->appState->emulateAreaCode('adminhtml', [$this, 'execute']);
     }
 
-    /**
-     * Executes the product creation process with inventory and category assignment.
-     *
+     /**
+     * Executes the product creation process.
+     * @param string $sku
+     * @param int $quantity
      * @return void
      */
     public function execute(): void
@@ -116,7 +99,7 @@ class AddSimpleProduct implements DataPatchInterface
         $product = $this->productFactory->create();
 
         if ($product->getIdBySku('demo-product')) {
-            return; 
+            return;
         }
 
         $attributeSetId = $this->eavSetup->getAttributeSetId(Product::ENTITY, 'Default');
