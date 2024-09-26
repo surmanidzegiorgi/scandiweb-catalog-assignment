@@ -1,5 +1,9 @@
 <?php
 
+// code with additional comments to help with future review 🧐
+// code with additional comments to help with future review 🧐
+// code with additional comments to help with future review 🧐
+
 namespace Scandiweb\Test\Setup\Patch\Data;
 
 use Magento\Catalog\Api\CategoryLinkManagementInterface;
